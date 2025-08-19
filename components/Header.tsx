@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Menu, X, User, Settings, Bookmark, BarChart3 } from 'lucide-react';
 import { useMoodStore } from '../store/moodStore';
 
