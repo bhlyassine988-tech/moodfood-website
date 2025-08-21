@@ -70,6 +70,40 @@ export default function Home() {
           </div>
         </motion.section>
 
+        {/* Demo Section - Sign In Modal */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="text-center mb-16 px-4"
+        >
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-neutral-800 mb-4">
+              Try Our New Sign-In Experience
+            </h2>
+            <p className="text-lg text-neutral-600 mb-6">
+              Experience the beautiful authentication modal that matches our MoodFood brand perfectly.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                // This will be handled by the Header component
+                // We'll add a global function to trigger the modal
+                if (typeof window !== 'undefined' && (window as any).openSignInModal) {
+                  (window as any).openSignInModal();
+                }
+              }}
+              className="bg-gradient-to-r from-orange-400 to-pink-400 text-white font-semibold py-3 px-6 rounded-xl hover:from-orange-500 hover:to-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              🚀 Demo Sign-In Modal
+            </motion.button>
+            <p className="text-sm text-neutral-500 mt-3">
+              Click the Profile button in the header or use this demo button
+            </p>
+          </div>
+        </motion.section>
+
         {/* Mood Selection Section */}
         <section className="mb-16">
           <MoodWheel />

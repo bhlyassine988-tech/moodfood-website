@@ -1,21 +1,41 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Menu, X, User, Settings, Bookmark, BarChart3 } from 'lucide-react';
 import { useMoodStore } from '../store/moodStore';
+import SignInModal from './SignInModal';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const { clearMoods } = useMoodStore();
+
+  // Expose global function for demo button
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).openSignInModal = () => setIsSignInModalOpen(true);
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).openSignInModal;
+      }
+    };
+  }, []);
 
   const handleLogoClick = () => {
     clearMoods();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const menuItems = [
-    { name: 'Profile', icon: <User className="w-5 h-5" />, href: '#profile' },
+  const menuItems: Array<{
+    name: string;
+    icon: React.ReactNode;
+    href?: string;
+    action?: () => void;
+  }> = [
+    { name: 'Profile', icon: <User className="w-5 h-5" />, action: () => setIsSignInModalOpen(true) },
     { name: 'Favorites', icon: <Bookmark className="w-5 h-5" />, href: '#favorites' },
     { name: 'Insights', icon: <BarChart3 className="w-5 h-5" />, href: '#insights' },
     { name: 'Settings', icon: <Settings className="w-5 h-5" />, href: '#settings' },
@@ -50,15 +70,27 @@ const Header: React.FC = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {menuItems.map((item) => (
-              <motion.a
-                key={item.name}
-                href={item.href}
-                whileHover={{ y: -2 }}
-                className="flex items-center gap-2 text-neutral-600 hover:text-primary-600 transition-colors font-medium"
-              >
-                {item.icon}
-                <span>{item.name}</span>
-              </motion.a>
+              item.action ? (
+                <motion.button
+                  key={item.name}
+                  onClick={item.action}
+                  whileHover={{ y: -2 }}
+                  className="flex items-center gap-2 text-neutral-600 hover:text-primary-600 transition-colors font-medium bg-transparent border-none cursor-pointer"
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </motion.button>
+              ) : (
+                <motion.a
+                  key={item.name}
+                  href={item.href}
+                  whileHover={{ y: -2 }}
+                  className="flex items-center gap-2 text-neutral-600 hover:text-primary-600 transition-colors font-medium"
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </motion.a>
+              )
             ))}
           </nav>
 
@@ -86,21 +118,41 @@ const Header: React.FC = () => {
             >
               <div className="py-4 space-y-2">
                 {menuItems.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className="flex items-center gap-3 px-4 py-3 text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 rounded-lg transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.icon}
-                    <span className="font-medium">{item.name}</span>
-                  </a>
+                  item.action ? (
+                    <button
+                      key={item.name}
+                      onClick={() => {
+                        item.action?.();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 rounded-lg transition-colors bg-transparent border-none w-full text-left"
+                    >
+                      {item.icon}
+                      <span className="font-medium">{item.name}</span>
+                    </button>
+                  ) : (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className="flex items-center gap-3 px-4 py-3 text-neutral-600 hover:text-primary-600 hover:bg-neutral-50 rounded-lg transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.icon}
+                      <span className="font-medium">{item.name}</span>
+                    </a>
+                  )
                 ))}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+      
+      {/* Sign In Modal */}
+      <SignInModal
+        isOpen={isSignInModalOpen}
+        onClose={() => setIsSignInModalOpen(false)}
+      />
     </header>
   );
 };
